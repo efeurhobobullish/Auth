@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html class="bg-gray-100">
+<head>
+  <title>Signup</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-sm">
+    <h2 class="text-xl font-bold text-center mb-4">Sign Up</h2>
+    <form id="signupForm" class="space-y-3">
+      <input type="text" id="name" placeholder="Name" class="w-full border px-3 py-2 rounded" required />
+      <input type="text" id="phone" placeholder="WhatsApp Number (e.g. 23481XXXXXXX)" class="w-full border px-3 py-2 rounded" required />
+      <button type="submit" class="w-full bg-purple-600 text-white py-2 rounded">Send Code</button>
+    </form>
+    <div id="verifySection" class="hidden mt-4">
+      <input type="text" id="code" placeholder="Enter OTP" class="w-full border px-3 py-2 rounded mb-2" />
+      <button onclick="verifyCode()" class="w-full bg-green-600 text-white py-2 rounded">Verify</button>
+    </div>
+    <p id="message" class="mt-4 text-sm text-red-600 text-center"></p>
+  </div>
+<script>
+const form = document.getElementById('signupForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const name = document.getElementById('name').value;
+  const phone = document.getElementById('phone').value;
+  const res = await fetch('/signup', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name, phone })
+  });
+  const data = await res.json();
+  document.getElementById('message').innerText = data.message;
+  if (data.success) document.getElementById('verifySection').classList.remove('hidden');
+});
+
+async function verifyCode() {
+  const phone = document.getElementById('phone').value;
+  const code = document.getElementById('code').value;
+  const res = await fetch('/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, code })
+  });
+  const data = await res.json();
+  if (data.success) window.location.href = "/login";
+  else document.getElementById('message').innerText = data.message;
+}
+</script>
+</body>
+</html>
